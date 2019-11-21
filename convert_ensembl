@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cd /ensembl
+
+perl biomart_inputfile_1.pl > biomart_outputfile_1.txt
+perl biomart_inputfile_2.pl > biomart_outputfile_2.txt
+perl biomart_inputfile_3.pl > biomart_outputfile_3.txt
+
+sed -i '1,2d' biomart_outputfile_1.txt
+sed -i '1,2d' biomart_outputfile_2.txt
+sed -i '1,2d' biomart_outputfile_3.txt
+
+ruby rdf_converter_ensembl_rgch37.rb -g biomart_outputfile_1.txt -e biomart_outputfile_2.txt -x biomart_outputfile_3.txt > /data/ensembl.ttl 
+
+chmod 777 /data/ensembl.ttl
