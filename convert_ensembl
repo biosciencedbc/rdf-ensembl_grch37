@@ -2,17 +2,22 @@
 
 cd /ensembl
 
-# データの取得
-perl biomart_inputfile_1.pl > biomart_outputfile_1.txt
-perl biomart_inputfile_2.pl > biomart_outputfile_2.txt
-perl biomart_inputfile_3.pl > biomart_outputfile_3.txt
+# download data
+{ perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>biomart_outputfile_1.txt
+{ perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>biomart_outputfile_2.txt
+{ perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>biomart_outputfile_3.txt
 
-# 不要行の削除
-sed -i '1,2d' biomart_outputfile_1.txt
-sed -i '1,2d' biomart_outputfile_2.txt
-sed -i '1,2d' biomart_outputfile_3.txt
+headline1=$(grep -e "Gene stable ID" -n biomart_outputfile_1.txt | sed -e 's/:.*//g')
+headline2=$(grep -e "Gene stable ID" -n biomart_outputfile_2.txt | sed -e 's/:.*//g')
+headline3=$(grep -e "Gene stable ID" -n biomart_outputfile_3.txt | sed -e 's/:.*//g')
 
-# 変換の実行
+
+# delete unnecessary rows
+sed -i "1,$(($headline1-1))d" biomart_outputfile_1.txt
+sed -i "1,$(($headline2-1))d" biomart_outputfile_2.txt
+sed -i "1,$(($headline3-1))d" biomart_outputfile_3.txt
+
+# convert
 ruby ./rdf_converter_ensembl_human_grch37/rdf_converter_ensembl_rgch37.rb -g biomart_outputfile_1.txt -e biomart_outputfile_2.txt -x biomart_outputfile_3.txt > /data/ensembl.ttl 
 
 chmod 777 /data/ensembl.ttl
