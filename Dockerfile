@@ -2,7 +2,8 @@ FROM ruby:2.6
 
 
 RUN mkdir /ensembl && \
-    mkdir /data
+    mkdir /data && \
+    mkdir /work
 
 WORKDIR /ensembl
 

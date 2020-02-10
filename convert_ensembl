@@ -2,22 +2,26 @@
 
 cd /ensembl
 
-# download data
-{ perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>biomart_outputfile_1.txt
-{ perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>biomart_outputfile_2.txt
-{ perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>biomart_outputfile_3.txt
+test -e /work/biomart_outputfile_1.txt && rm /work/biomart_outputfile_1.txt
+test -e /work/biomart_outputfile_2.txt && rm /work/biomart_outputfile_2.txt
+test -e /work/biomart_outputfile_3.txt && rm /work/biomart_outputfile_3.txt
 
-headline1=$(grep -e "Gene stable ID" -n biomart_outputfile_1.txt | sed -e 's/:.*//g')
-headline2=$(grep -e "Gene stable ID" -n biomart_outputfile_2.txt | sed -e 's/:.*//g')
-headline3=$(grep -e "Gene stable ID" -n biomart_outputfile_3.txt | sed -e 's/:.*//g')
+# download data
+{ perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_1.txt
+{ perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_2.txt
+{ perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_3.txt
+
+headline1=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_1.txt | sed -e 's/:.*//g')
+headline2=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_2.txt | sed -e 's/:.*//g')
+headline3=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_3.txt | sed -e 's/:.*//g')
 
 
 # delete unnecessary rows
-sed -i "1,$(($headline1-1))d" biomart_outputfile_1.txt
-sed -i "1,$(($headline2-1))d" biomart_outputfile_2.txt
-sed -i "1,$(($headline3-1))d" biomart_outputfile_3.txt
+sed -i "1,$(($headline1-1))d" /work/biomart_outputfile_1.txt
+sed -i "1,$(($headline2-1))d" /work/biomart_outputfile_2.txt
+sed -i "1,$(($headline3-1))d" /work/biomart_outputfile_3.txt
 
 # convert
-ruby ./rdf_converter_ensembl_human_grch37/rdf_converter_ensembl_rgch37.rb -g biomart_outputfile_1.txt -e biomart_outputfile_2.txt -x biomart_outputfile_3.txt > /data/ensembl.ttl 
+ruby ./rdf_converter_ensembl_human_grch37/rdf_converter_ensembl_rgch37.rb -g /work/biomart_outputfile_1.txt -e /work/biomart_outputfile_2.txt -x /work/biomart_outputfile_3.txt > /data/ensembl.ttl 
 
-chmod 777 /data/ensembl.ttl
+chmod 777 /data/ensembl.ttl && chmod 777 /work/biomart_outputfile_1.txt /work/biomart_outputfile_2.txt /work/biomart_outputfile_3.txt
