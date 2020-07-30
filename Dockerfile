@@ -1,6 +1,5 @@
 FROM ruby:2.6
 
-
 RUN mkdir /ensembl && \
     mkdir /data && \
     mkdir /work
@@ -19,8 +18,7 @@ RUN cpan install Exception::Class
 RUN cpan install XML::DOM
 RUN cpan install Readonly 
 
-CMD /ensembl/convert_ensembl
-
+ENTRYPOINT ["/ensembl/convert_ensembl"]
 
 
 
