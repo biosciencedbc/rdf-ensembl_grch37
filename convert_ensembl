@@ -29,6 +29,8 @@ sed -i "1,$(($headline3-1))d" /work/biomart_outputfile_3.txt
 now=`date "+%Y%m%d-%H%M%S"`
 echo "Started convert at $now"
 ruby ./rdf_converter_ensembl_human_grch37/rdf_converter_ensembl_rgch37.rb -g /work/biomart_outputfile_1.txt -e /work/biomart_outputfile_2.txt -x /work/biomart_outputfile_3.txt 1> /data/ensembl.ttl 2> error.log
+
+# Delete unnecessary strings  from error log
 cat error.log | sed -e '/gene_stable_id transcript_stable_id hgnc_id uniprotkb_swiss_prot_id uniprotkb_trembl_id/d' | sed -e '/parse external ..../d' | sed -e '/parse ..../d' | sed -e '/rdf ..../d' > /dev/stderr
 
 chmod 777 /data/ensembl.ttl /work/biomart_outputfile_1.txt /work/biomart_outputfile_2.txt /work/biomart_outputfile_3.txt
