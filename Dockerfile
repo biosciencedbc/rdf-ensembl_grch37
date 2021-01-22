@@ -11,6 +11,8 @@ ADD ./ /ensembl
 ENV PERL5LIB=/ensembl/biomart-perl/lib
 ENV PERL_AUTOINSTALL='--defaultdeps'
 
+RUN apt-get update
+RUN apt-get -y install jq
 RUN cpan install XML::Simple
 RUN cpan install DBI 
 RUN cpan install Log::Log4perl
