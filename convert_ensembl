@@ -16,7 +16,7 @@ shift  $(($OPTIND - 1))
 # バージョンファイルがある場合
 if [ -e /work/version.json ]; then
   # バージョンファイルを取得し、比較する
-  wget -O /version_tmp.json https://rest.ensembl.org/info/data/?content-type=application/json
+  wget -O /version_tmp.json https://rest.ensembl.org/info/data/?content-type=application/json 2> /dev/stdout
   OLD_VERSION=`cat /work/version.json | jq '.releases[0]'`
   NEW_VERSION=`cat /version_tmp.json | jq '.releases[0]'`
   # バージョンに更新がない場合
@@ -29,7 +29,7 @@ if [ -e /work/version.json ]; then
   fi
 # バージョンファイルがない場合、バージョンファイルを取得する
 else
-  wget -O /work/version.json https://rest.ensembl.org/info/data/?content-type=application/json
+  wget -O /work/version.json https://rest.ensembl.org/info/data/?content-type=application/json 2> /dev/stdout
   chmod 777 /work/version.json
 fi
 
@@ -42,20 +42,22 @@ fi
 
 cd /ensembl
 
-# すでにアーカイブファイルが存在する場合は削除する
-test -e /work/biomart_outputfile_1.txt && rm /work/biomart_outputfile_1.txt
-test -e /work/biomart_outputfile_2.txt && rm /work/biomart_outputfile_2.txt
-test -e /work/biomart_outputfile_3.txt && rm /work/biomart_outputfile_3.txt
-
-# アーカイブファイルのダウンロード
-now=`date "+%Y%m%d-%H%M%S"`
-echo "Started download at $now"
-{ perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_1.txt
-{ perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_2.txt
-{ perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_3.txt
-now=`date "+%Y%m%d-%H%M%S"`
-echo "Finished download at $now"
-
+# バージョンに更新がある、またはアーカイブファイル
+if [ ! $NEWFILE -eq 0 ] || [ ! -e /work/biomart_outputfile_1.txt ] || [ ! -e /work/biomart_outputfile_2.txt ] || [ ! -e /work/biomart_outputfile_3.txt ]; then
+  # すでにアーカイブファイルが存在する場合は削除する
+  test -e /work/biomart_outputfile_1.txt && rm /work/biomart_outputfile_1.txt
+  test -e /work/biomart_outputfile_2.txt && rm /work/biomart_outputfile_2.txt
+  test -e /work/biomart_outputfile_3.txt && rm /work/biomart_outputfile_3.txt
+  
+  # アーカイブファイルのダウンロード
+  now=`date "+%Y%m%d-%H%M%S"`
+  echo "Started download at $now"
+  { perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_1.txt
+  { perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_2.txt
+  { perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_3.txt
+  now=`date "+%Y%m%d-%H%M%S"`
+  echo "Finished download at $now"
+fi
 headline1=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_1.txt | sed -e 's/:.*//g')
 headline2=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_2.txt | sed -e 's/:.*//g')
 headline3=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_3.txt | sed -e 's/:.*//g')
