@@ -52,20 +52,25 @@ if [ ! $NEWFILE -eq 0 ] || [ ! -e /work/biomart_outputfile_1.txt ] || [ ! -e /wo
   # アーカイブファイルのダウンロード
   now=`date "+%Y%m%d-%H%M%S"`
   echo "Started download at $now"
-  { perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_1.txt
-  { perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_2.txt
-  { perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_3.txt
+  { perl biomart_inputfile_1.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_1.txt &
+  { perl biomart_inputfile_2.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_2.txt &
+  { perl biomart_inputfile_3.pl 3>&1 1>&2 2>&3; }  2>/work/biomart_outputfile_3.txt &
+  
+  wait
+
   now=`date "+%Y%m%d-%H%M%S"`
   echo "Finished download at $now"
-fi
-headline1=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_1.txt | sed -e 's/:.*//g')
-headline2=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_2.txt | sed -e 's/:.*//g')
-headline3=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_3.txt | sed -e 's/:.*//g')
+  
+  headline1=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_1.txt | sed -e 's/:.*//g')
+  headline2=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_2.txt | sed -e 's/:.*//g')
+  headline3=$(grep -e "Gene stable ID" -n /work/biomart_outputfile_3.txt | sed -e 's/:.*//g')
 
-# 不要行の削除
-sed -i "1,$(($headline1-1))d" /work/biomart_outputfile_1.txt
-sed -i "1,$(($headline2-1))d" /work/biomart_outputfile_2.txt
-sed -i "1,$(($headline3-1))d" /work/biomart_outputfile_3.txt
+  # 不要行の削除
+  sed -i "1,$(($headline1-1))d" /work/biomart_outputfile_1.txt
+  sed -i "1,$(($headline2-1))d" /work/biomart_outputfile_2.txt
+  sed -i "1,$(($headline3-1))d" /work/biomart_outputfile_3.txt
+
+fi
 
 # RDF変換の実行
 now=`date "+%Y%m%d-%H%M%S"`
