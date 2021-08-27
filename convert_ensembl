@@ -25,7 +25,8 @@ if [ -e /work/version.json ]; then
   # バージョンに更新がある場合はすでにあるファイルに上書きする
   else
     cp /version_tmp.json /work/version.json
-    chmod 777 /work/version.json
+    cat /work/version.json | jq '.releases[0]' > /work/version.txt
+    chmod 777 /work/version.json /work/version.txt
   fi
 # バージョンファイルがない場合、バージョンファイルを取得する
 else
