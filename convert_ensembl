@@ -30,7 +30,8 @@ if [ -e /work/version.json ]; then
 # バージョンファイルがない場合、バージョンファイルを取得する
 else
   wget -O /work/version.json https://rest.ensembl.org/info/data/?content-type=application/json 2> /dev/stdout
-  chmod 777 /work/version.json
+  cat /work/version.json | jq '.releases[0]' > /work/version.txt
+  chmod 777 /work/version.json /work/version.txt
 fi
 
 # バージョンに更新がなく、-fオプションが指定されていない場合はコンバートを実行しない
