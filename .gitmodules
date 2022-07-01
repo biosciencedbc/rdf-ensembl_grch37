@@ -1,3 +1,4 @@
 [submodule "rdf_converter_ensembl_human_grch37"]
 	path = rdf_converter_ensembl_human_grch37
-	url = https://github.com/skwsm/rdf_converter_ensembl_human_grch37.git
+	url = https://github.com/skwsm/rdf_converter_ensembl_human_grch37
+	branch = master
